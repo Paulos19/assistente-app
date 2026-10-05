@@ -19,7 +19,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-class ApiClient(private val baseUrl: String = "https://agent.khdya3.easypanel.host") {
+class ApiClient(private val baseUrl: String = "https://agent.phdev.top") {
 
     val client = HttpClient(CIO) {
         install(ContentNegotiation) {
