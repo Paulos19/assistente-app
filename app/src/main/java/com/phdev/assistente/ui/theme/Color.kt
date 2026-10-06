@@ -1,35 +1,67 @@
 package com.phdev.assistente.ui.theme
 
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-val DarkBackground = Color(0xFF090D16)
-val DarkSurface = Color(0xFF131B2E)
-val DarkCard = Color(0xFF1B243B)
-val DarkCardBorder = Color(0xFF2E3D63)
+// Warm Brown & Cream Palette (Light Modern Theme)
+val LightBackground = Color(0xFFF9F7F4)       // Baunilha / Linho claro suave
+val LightSurface = Color(0xFFFFFFFF)          // Branco puro para elevação/cards primários
+val LightSurfaceAlt = Color(0xFFF2ECE4)       // Creme amendoado para contraste sutil
+val LightCard = Color(0xFFFFFFFF)
+val LightCardBorder = Color(0xFFE8DFD5)       // Borda quente e delicada
+val LightCardBorderMuted = Color(0xFFF0EAE1)
 
-val AccentPrimary = Color(0xFF6366F1) // Indigo tech
-val AccentSecondary = Color(0xFF06B6D4) // Cyan neon
-val AccentSuccess = Color(0xFF10B981) // Emerald
-val AccentWarning = Color(0xFFF59E0B) // Amber
-val AccentDanger = Color(0xFFEF4444) // Rose
+// Marrons Nobres (Espresso, Caramelo, Castanho Quente)
+val MochaPrimary = Color(0xFF4A2E18)         // Espresso marcante para títulos e botões principais
+val MochaSecondary = Color(0xFF7C5335)       // Marrom intermediário aconchegante
+val TerracottaAccent = Color(0xFFB85D38)     // Terracota vivo para destaques energéticos
+val CaramelGlow = Color(0xFFD48B47)          // Dourado/Caramelo elegante para gradientes
+val SandAccent = Color(0xFFEADBC8)           // Areia dourada para chips e backgrounds de tags
 
-val TextPrimary = Color(0xFFF8FAFC)
-val TextSecondary = Color(0xFF94A3B8)
-val TextMuted = Color(0xFF64748B)
+// Cores de Status Refinadas em Tons Terrosos / Quentes
+val StatusSuccess = Color(0xFF2E6948)        // Verde floresta orgânico
+val StatusSuccessBg = Color(0xFFEBF5EE)
+val StatusError = Color(0xFFA83232)          // Vermelho terracota
+val StatusErrorBg = Color(0xFFFDF0F0)
+val StatusWarning = Color(0xFFC27803)        // Âmbar
+val StatusWarningBg = Color(0xFFFEF7E6)
 
-val AssistenteColorScheme = darkColorScheme(
-    primary = AccentPrimary,
-    onPrimary = Color.White,
-    secondary = AccentSecondary,
-    onSecondary = Color.White,
-    background = DarkBackground,
+// Tipografia e Texto
+val TextPrimary = Color(0xFF2B1B12)          // Marrom muito escuro / quase café para legibilidade máxima
+val TextSecondary = Color(0xFF736055)        // Marrom neutro atenuado
+val TextMuted = Color(0xFFA69488)            // Marrom suave para placeholders e notas
+val TextOnDark = Color(0xFFFFFDFC)           // Branco quebrado para leitura em cima de botões escuros
+
+// Gradientes Quentes de Alto Padrão
+val WarmMochaGradient = Brush.linearGradient(
+    colors = listOf(MochaPrimary, MochaSecondary)
+)
+
+val TerracottaGlowGradient = Brush.linearGradient(
+    colors = listOf(TerracottaAccent, CaramelGlow)
+)
+
+val CardWarmSubtleGradient = Brush.verticalGradient(
+    colors = listOf(Color(0xFFFFFFFF), Color(0xFFFAF7F2))
+)
+
+val HeaderWarmGradient = Brush.verticalGradient(
+    colors = listOf(Color(0xFFF5EFE6), Color(0xFFF9F7F4))
+)
+
+// Esquema Material3
+val AssistenteColorScheme = lightColorScheme(
+    primary = MochaPrimary,
+    onPrimary = TextOnDark,
+    secondary = MochaSecondary,
+    onSecondary = TextOnDark,
+    tertiary = TerracottaAccent,
+    background = LightBackground,
+    surface = LightSurface,
     onBackground = TextPrimary,
-    surface = DarkSurface,
     onSurface = TextPrimary,
-    surfaceVariant = DarkCard,
+    surfaceVariant = LightSurfaceAlt,
     onSurfaceVariant = TextSecondary,
-    outline = DarkCardBorder,
-    error = AccentDanger,
-    onError = Color.White
+    outline = LightCardBorder
 )

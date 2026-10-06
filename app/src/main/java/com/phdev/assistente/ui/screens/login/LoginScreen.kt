@@ -1,21 +1,26 @@
 package com.phdev.assistente.ui.screens.login
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Phone
-import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -37,30 +42,40 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkBackground)
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(LightBackground, LightSurfaceAlt, LightBackground)
+                )
+            )
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, DarkCardBorder, RoundedCornerShape(24.dp)),
-            colors = CardDefaults.cardColors(containerColor = DarkSurface),
-            shape = RoundedCornerShape(24.dp)
+                .shadow(
+                    elevation = 14.dp,
+                    shape = RoundedCornerShape(28.dp),
+                    spotColor = MochaPrimary.copy(alpha = 0.12f),
+                    ambientColor = MochaPrimary.copy(alpha = 0.06f)
+                )
+                .border(1.dp, LightCardBorder, RoundedCornerShape(28.dp)),
+            colors = CardDefaults.cardColors(containerColor = LightSurface),
+            shape = RoundedCornerShape(28.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(32.dp),
+                    .padding(horizontal = 26.dp, vertical = 34.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Badge de Topo
+                // Badge de Topo Estilo Editorial Moderno
                 Surface(
                     shape = RoundedCornerShape(50),
-                    color = AccentPrimary.copy(alpha = 0.15f),
-                    border = null,
-                    modifier = Modifier.padding(bottom = 20.dp)
+                    color = SandAccent.copy(alpha = 0.45f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, SandAccent),
+                    modifier = Modifier.padding(bottom = 22.dp)
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
@@ -68,52 +83,74 @@ fun LoginScreen(
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(8.dp)
-                                .clip(RoundedCornerShape(50))
-                                .background(AccentSecondary)
+                                .size(7.dp)
+                                .clip(CircleShape)
+                                .background(TerracottaAccent)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "ASSISTENTE AUTÔNOMO",
-                            color = AccentSecondary,
+                            text = "PORTAL SEGURO",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
+                            letterSpacing = 1.2.sp,
+                            color = MochaPrimary
                         )
                     }
                 }
 
+                // Ícone Central em Gradiente Mocha
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(WarmMochaGradient),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Security,
+                        contentDescription = "Segurança",
+                        tint = TextOnDark,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // Título e Subtítulo
                 Text(
-                    text = "Acesso Seguro",
+                    text = "Assistente Pessoal",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
                     color = TextPrimary,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Digite o número cadastrado no sistema para liberar seu painel",
+                    text = "Acesse com seu número autorizado para gerenciar suas automações e infraestrutura.",
+                    fontSize = 13.sp,
                     color = TextSecondary,
-                    fontSize = 14.sp,
                     textAlign = TextAlign.Center,
-                    lineHeight = 20.sp
+                    lineHeight = 18.sp
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
+                // Campo de Texto Elegante
                 OutlinedTextField(
                     value = phoneNumber,
                     onValueChange = { phoneNumber = it },
-                    label = { Text("Número (ex: 5511999999999)") },
+                    label = { Text("Telefone / WhatsApp", color = TextMuted) },
+                    placeholder = { Text("Ex: 5511999999999", color = TextMuted.copy(alpha = 0.6f)) },
+                    singleLine = true,
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Rounded.Phone,
                             contentDescription = "Telefone",
-                            tint = AccentSecondary
+                            tint = MochaPrimary
                         )
                     },
-                    singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Phone,
                         imeAction = ImeAction.Done
@@ -121,61 +158,106 @@ fun LoginScreen(
                     keyboardActions = KeyboardActions(
                         onDone = {
                             if (phoneNumber.isNotBlank() && !isLoading) {
-                                onLoginClick(phoneNumber.trim())
+                                onLoginClick(phoneNumber)
                             }
                         }
                     ),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AccentPrimary,
-                        unfocusedBorderColor = DarkCardBorder,
-                        focusedLabelColor = AccentPrimary,
-                        unfocusedLabelColor = TextMuted,
+                        focusedContainerColor = LightBackground,
+                        unfocusedContainerColor = LightBackground,
+                        focusedBorderColor = MochaPrimary,
+                        unfocusedBorderColor = LightCardBorder,
                         focusedTextColor = TextPrimary,
                         unfocusedTextColor = TextPrimary
-                    ),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    )
                 )
 
-                AnimatedVisibility(visible = errorMessage != null) {
-                    errorMessage?.let {
+                // Mensagem de Erro com Animação
+                AnimatedVisibility(
+                    visible = errorMessage != null,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    if (errorMessage != null) {
                         Text(
-                            text = it,
-                            color = AccentDanger,
-                            fontSize = 13.sp,
-                            modifier = Modifier.padding(top = 12.dp),
+                            text = errorMessage,
+                            color = StatusError,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(top = 10.dp),
                             textAlign = TextAlign.Center
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(28.dp))
+                Spacer(modifier = Modifier.height(26.dp))
 
+                // Botão de Login com Gradiente Espresso & Terracota
                 Button(
-                    onClick = { onLoginClick(phoneNumber.trim()) },
+                    onClick = { onLoginClick(phoneNumber) },
                     enabled = phoneNumber.isNotBlank() && !isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(54.dp),
-                    shape = RoundedCornerShape(16.dp),
+                        .height(54.dp)
+                        .shadow(
+                            elevation = if (phoneNumber.isNotBlank() && !isLoading) 6.dp else 0.dp,
+                            shape = RoundedCornerShape(16.dp),
+                            spotColor = MochaPrimary.copy(alpha = 0.25f)
+                        ),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = AccentPrimary,
-                        disabledContainerColor = DarkCardBorder
-                    )
+                        containerColor = MochaPrimary,
+                        contentColor = TextOnDark,
+                        disabledContainerColor = TextMuted.copy(alpha = 0.25f),
+                        disabledContentColor = TextMuted
+                    ),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(
-                            color = Color.White,
+                            color = TextOnDark,
                             modifier = Modifier.size(22.dp),
-                            strokeWidth = 2.5.dp
+                            strokeWidth = 2.dp
                         )
                     } else {
-                        Text(
-                            text = "Entrar no App",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Entrar no Sistema",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(
+                                imageVector = Icons.Rounded.ArrowForward,
+                                contentDescription = "Avançar",
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                     }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Rodapé de Criptografia
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Lock,
+                        contentDescription = "Criptografia",
+                        tint = TextMuted,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "Conexão Segura E2E & VPS Host",
+                        fontSize = 11.sp,
+                        color = TextMuted
+                    )
                 }
             }
         }
