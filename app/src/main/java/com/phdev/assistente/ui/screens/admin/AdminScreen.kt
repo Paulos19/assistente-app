@@ -22,14 +22,18 @@ import com.phdev.assistente.data.model.ChatMessage
 import com.phdev.assistente.data.model.SystemStatus
 import com.phdev.assistente.ui.theme.*
 
+import com.phdev.assistente.data.model.MediaItem
+import com.phdev.assistente.ui.screens.guest.MediaDownloaderContent
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminScreen(
     onLogout: () -> Unit,
     status: SystemStatus?,
-    onActionClick: (String) -> Unit
+    onActionClick: (String) -> Unit,
+    onRequestDownload: (url: String, format: String, onResult: (Result<MediaItem>) -> Unit) -> Unit = { _, _, _ -> }
 ) {
-    var selectedTab by remember { mutableIntStateOf(0) } // 0 = Dashboard, 1 = Chat Agente
+    var selectedTab by remember { mutableIntStateOf(0) } // 0 = Dashboard, 1 = Mídia, 2 = Chat Agente
 
     Scaffold(
         topBar = {
@@ -83,6 +87,19 @@ fun AdminScreen(
                 NavigationBarItem(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
+                    icon = { Icon(Icons.Rounded.CloudDownload, contentDescription = "Downloader") },
+                    label = { Text("Mídia") },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = AccentPrimary,
+                        selectedTextColor = AccentPrimary,
+                        unselectedIconColor = TextMuted,
+                        unselectedTextColor = TextMuted,
+                        indicatorColor = DarkCard
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
                     icon = { Icon(Icons.Rounded.Terminal, contentDescription = "Terminal & Chat") },
                     label = { Text("Agente") },
                     colors = NavigationBarItemDefaults.colors(
@@ -98,10 +115,10 @@ fun AdminScreen(
         containerColor = DarkBackground
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
-            if (selectedTab == 0) {
-                AdminDashboardTab(status = status, onActionClick = onActionClick)
-            } else {
-                AdminAgentChatTab()
+            when (selectedTab) {
+                0 -> AdminDashboardTab(status = status, onActionClick = onActionClick)
+                1 -> MediaDownloaderContent(onRequestDownload = onRequestDownload)
+                else -> AdminAgentChatTab()
             }
         }
     }

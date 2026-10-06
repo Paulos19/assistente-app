@@ -16,8 +16,11 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.client.statement.bodyAsText
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 class ApiClient(private val baseUrl: String = "https://agent.phdev.top") {
 
@@ -54,12 +57,34 @@ class ApiClient(private val baseUrl: String = "https://agent.phdev.top") {
 
     suspend fun requestDownload(url: String, format: String): Result<MediaItem> {
         return try {
-            val response: MediaItem = client.post("$baseUrl/api/media/download") {
+            var normalizedUrl = url.trim()
+            if (normalizedUrl.startsWith("//")) {
+                normalizedUrl = "https:$normalizedUrl"
+            } else if (!normalizedUrl.startsWith("http://") && !normalizedUrl.startsWith("https://")) {
+                normalizedUrl = "https://$normalizedUrl"
+            }
+
+            val httpResponse = client.post("$baseUrl/api/media/download") {
                 contentType(ContentType.Application.Json)
                 authToken?.let { header("Authorization", "Bearer $it") }
-                setBody(DownloadMediaRequest(url = url, format = format))
-            }.body()
-            Result.success(response)
+                setBody(DownloadMediaRequest(url = normalizedUrl, format = format))
+            }
+
+            if (httpResponse.status.value in 200..299) {
+                Result.success(httpResponse.body<MediaItem>())
+            } else {
+                val errorBody = httpResponse.bodyAsText()
+                val errorMsg = try {
+                    val jsonElem = Json.parseToJsonElement(errorBody)
+                    jsonElem.jsonObject["detail"]?.jsonPrimitive?.content
+                        ?: jsonElem.jsonObject["message"]?.jsonPrimitive?.content
+                        ?: jsonElem.jsonObject["error"]?.jsonPrimitive?.content
+                        ?: "Erro no servidor (${httpResponse.status.value})"
+                } catch (_: Exception) {
+                    "Erro no servidor (${httpResponse.status.value})"
+                }
+                Result.failure(Exception(errorMsg))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -67,10 +92,14 @@ class ApiClient(private val baseUrl: String = "https://agent.phdev.top") {
 
     suspend fun getSystemStatus(): Result<SystemStatus> {
         return try {
-            val status: SystemStatus = client.get("$baseUrl/api/admin/status") {
+            val response = client.get("$baseUrl/api/admin/status") {
                 authToken?.let { header("Authorization", "Bearer $it") }
-            }.body()
-            Result.success(status)
+            }
+            if (response.status.value in 200..299) {
+                Result.success(response.body<SystemStatus>())
+            } else {
+                Result.failure(Exception("Falha ao obter status (${response.status.value})"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

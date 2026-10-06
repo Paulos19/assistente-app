@@ -116,6 +116,12 @@ fun AppNavigation(
                             res.onSuccess { systemStatus = it }
                         }
                     }
+                },
+                onRequestDownload = { url, format, onResult ->
+                    scope.launch {
+                        val result = apiClient.requestDownload(url, format)
+                        onResult(result)
+                    }
                 }
             )
         }

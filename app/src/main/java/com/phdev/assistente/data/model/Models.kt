@@ -25,21 +25,21 @@ data class DownloadMediaRequest(
 
 @Serializable
 data class MediaItem(
-    val id: String,
-    val title: String,
+    val id: String = "",
+    val title: String = "",
     val author: String? = null,
     val duration: String? = null,
     val thumbnail: String? = null,
-    val downloadUrl: String,
-    val format: String,
+    val downloadUrl: String = "",
+    val format: String = "mp3",
     val fileSize: String? = null
 )
 
 @Serializable
 data class SystemStatus(
-    val vpsCpuPercent: Double,
-    val vpsMemoryPercent: Double,
-    val pcConnected: Boolean,
+    val vpsCpuPercent: Double = 0.0,
+    val vpsMemoryPercent: Double = 0.0,
+    val pcConnected: Boolean = false,
     val pcHostName: String? = null,
     val activeTasks: Int = 0
 )

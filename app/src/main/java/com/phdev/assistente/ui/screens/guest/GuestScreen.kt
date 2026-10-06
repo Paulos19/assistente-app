@@ -36,13 +36,6 @@ fun GuestScreen(
     onLogout: () -> Unit,
     onRequestDownload: (url: String, format: String, onResult: (Result<MediaItem>) -> Unit) -> Unit
 ) {
-    val context = LocalContext.current
-    var inputUrl by remember { mutableStateOf("") }
-    var selectedFormat by remember { mutableStateOf("mp3") } // "mp3" ou "mp4"
-    var isLoading by remember { mutableStateOf(false) }
-    var currentMedia by remember { mutableStateOf<MediaItem?>(null) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -77,14 +70,32 @@ fun GuestScreen(
         },
         containerColor = DarkBackground
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 20.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        MediaDownloaderContent(
+            onRequestDownload = onRequestDownload,
+            modifier = Modifier.padding(paddingValues)
+        )
+    }
+}
+
+@Composable
+fun MediaDownloaderContent(
+    onRequestDownload: (url: String, format: String, onResult: (Result<MediaItem>) -> Unit) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    var inputUrl by remember { mutableStateOf("") }
+    var selectedFormat by remember { mutableStateOf("mp3") } // "mp3" ou "mp4"
+    var isLoading by remember { mutableStateOf(false) }
+    var currentMedia by remember { mutableStateOf<MediaItem?>(null) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
             Spacer(modifier = Modifier.height(12.dp))
 
             // Card informativo
@@ -183,7 +194,13 @@ fun GuestScreen(
                             if (inputUrl.isNotBlank()) {
                                 isLoading = true
                                 errorMessage = null
-                                onRequestDownload(inputUrl.trim(), selectedFormat) { result ->
+                                var cleanUrl = inputUrl.trim()
+                                if (cleanUrl.startsWith("//")) {
+                                    cleanUrl = "https:$cleanUrl"
+                                } else if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
+                                    cleanUrl = "https://$cleanUrl"
+                                }
+                                onRequestDownload(cleanUrl, selectedFormat) { result ->
                                     isLoading = false
                                     result.onSuccess { item ->
                                         currentMedia = item
