@@ -50,6 +50,18 @@ val HeaderWarmGradient = Brush.verticalGradient(
     colors = listOf(Color(0xFFF5EFE6), Color(0xFFF9F7F4))
 )
 
+// Aliases de compatibilidade para telas legadas (Dark Theme / Antigo design)
+val DarkBackground = LightBackground
+val DarkSurface = LightSurface
+val DarkCard = LightCard
+val DarkCardBorder = LightCardBorder
+
+val AccentPrimary = MochaPrimary
+val AccentSecondary = MochaSecondary
+val AccentWarning = StatusWarning
+val AccentSuccess = StatusSuccess
+val AccentDanger = StatusError
+
 // Esquema Material3
 val AssistenteColorScheme = lightColorScheme(
     primary = MochaPrimary,
