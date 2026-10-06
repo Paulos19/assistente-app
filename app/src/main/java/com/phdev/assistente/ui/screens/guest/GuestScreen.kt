@@ -329,7 +329,6 @@ fun MediaDownloaderContent(
             Spacer(modifier = Modifier.height(30.dp))
         }
     }
-}
 
 // Dispara o download nativo do Android
 private fun triggerAndroidDownload(context: Context, media: MediaItem) {
