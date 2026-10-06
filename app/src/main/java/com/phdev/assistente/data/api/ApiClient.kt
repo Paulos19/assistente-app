@@ -16,6 +16,8 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.bodyAsText
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -31,6 +33,11 @@ class ApiClient(private val baseUrl: String = "https://agent.phdev.top") {
                 isLenient = true
                 encodeDefaults = true
             })
+        }
+        install(HttpTimeout) {
+            requestTimeoutMillis = 300_000 // 5 minutos
+            connectTimeoutMillis = 60_000  // 60s
+            socketTimeoutMillis = 300_000  // 5 minutos
         }
         install(WebSockets)
     }
@@ -58,13 +65,16 @@ class ApiClient(private val baseUrl: String = "https://agent.phdev.top") {
     suspend fun requestDownload(url: String, format: String): Result<MediaItem> {
         return try {
             var normalizedUrl = url.trim()
-            if (normalizedUrl.startsWith("//")) {
-                normalizedUrl = "https:$normalizedUrl"
-            } else if (!normalizedUrl.startsWith("http://") && !normalizedUrl.startsWith("https://")) {
-                normalizedUrl = "https://$normalizedUrl"
+            if (!normalizedUrl.startsWith("http://") && !normalizedUrl.startsWith("https://")) {
+                normalizedUrl = "https://" + normalizedUrl.trimStart('/')
             }
 
             val httpResponse = client.post("$baseUrl/api/media/download") {
+                timeout {
+                    requestTimeoutMillis = 300_000
+                    connectTimeoutMillis = 60_000
+                    socketTimeoutMillis = 300_000
+                }
                 contentType(ContentType.Application.Json)
                 authToken?.let { header("Authorization", "Bearer $it") }
                 setBody(DownloadMediaRequest(url = normalizedUrl, format = format))

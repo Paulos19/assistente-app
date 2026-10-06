@@ -195,15 +195,15 @@ fun MediaDownloaderContent(
                                 isLoading = true
                                 errorMessage = null
                                 var cleanUrl = inputUrl.trim()
-                                if (cleanUrl.startsWith("//")) {
-                                    cleanUrl = "https:$cleanUrl"
-                                } else if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
-                                    cleanUrl = "https://$cleanUrl"
+                                if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
+                                    cleanUrl = "https://" + cleanUrl.trimStart('/')
                                 }
                                 onRequestDownload(cleanUrl, selectedFormat) { result ->
                                     isLoading = false
                                     result.onSuccess { item ->
                                         currentMedia = item
+                                        // Inicia download direto automaticamente no celular com capa e metadados
+                                        triggerAndroidDownload(context, item)
                                     }.onFailure { err ->
                                         errorMessage = err.localizedMessage ?: "Falha ao processar mídia"
                                     }
@@ -318,7 +318,7 @@ fun MediaDownloaderContent(
                                 Icon(Icons.Rounded.Download, contentDescription = null)
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    "Salvar no Celular (${if (media.format == "mp3") "Música" else "Downloads"})",
+                                    "Baixar Novamente (${if (media.format == "mp3") "Música" else "Downloads"})",
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -333,17 +333,20 @@ fun MediaDownloaderContent(
 // Dispara o download nativo do Android
 private fun triggerAndroidDownload(context: Context, media: MediaItem) {
     try {
-        val destinationFolder = if (media.format.lowercase() == "mp3") {
+        val isMp3 = media.format.lowercase().contains("mp3")
+        val destinationFolder = if (isMp3) {
             Environment.DIRECTORY_MUSIC
         } else {
             Environment.DIRECTORY_DOWNLOADS
         }
 
-        val fileName = "${media.title.take(40).replace(Regex("[^a-zA-Z0-9.-]"), "_")}.${media.format}"
+        val safeTitle = media.title.take(50).replace(Regex("[^a-zA-Z0-9.-]"), "_").trim('_')
+        val ext = if (isMp3) "mp3" else if (media.format.lowercase().contains("mp4")) "mp4" else media.format.lowercase().trimStart('.')
+        val fileName = "${safeTitle.ifEmpty { "audio" }}.$ext"
 
         val request = DownloadManager.Request(Uri.parse(media.downloadUrl))
             .setTitle(media.title)
-            .setDescription("Baixando via Assistente...")
+            .setDescription("Baixando com capa e metadados oficiais...")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalPublicDir(destinationFolder, fileName)
             .setAllowedOverMetered(true)
@@ -352,8 +355,9 @@ private fun triggerAndroidDownload(context: Context, media: MediaItem) {
         val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         dm.enqueue(request)
 
-        Toast.makeText(context, "Download iniciado! Verifique suas notificações.", Toast.LENGTH_LONG).show()
+        val destName = if (isMp3) "Música" else "Downloads"
+        Toast.makeText(context, "Download direto iniciado! Salvo na pasta $destName com capa.", Toast.LENGTH_LONG).show()
     } catch (e: Exception) {
-        Toast.makeText(context, "Erro ao baixar: ${e.message}", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Erro ao iniciar download: ${e.message}", Toast.LENGTH_SHORT).show()
     }
 }
