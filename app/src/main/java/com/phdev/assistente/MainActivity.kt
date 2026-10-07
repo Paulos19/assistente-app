@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -19,7 +19,7 @@ import com.phdev.assistente.ui.screens.admin.AdminScreen
 import com.phdev.assistente.ui.screens.guest.GuestScreen
 import com.phdev.assistente.ui.screens.login.LoginScreen
 import com.phdev.assistente.ui.theme.AssistenteTheme
-import com.phdev.assistente.ui.theme.DarkBackground
+import com.phdev.assistente.ui.theme.GlassBackground
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -27,12 +27,13 @@ class MainActivity : ComponentActivity() {
     private val apiClient by lazy { ApiClient() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
             AssistenteTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = DarkBackground
+                    color = GlassBackground
                 ) {
                     AppNavigation(
                         apiClient = apiClient,
@@ -63,7 +64,7 @@ fun AppNavigation(
         startDestination = "login",
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkBackground)
+            .background(GlassBackground)
     ) {
         composable("login") {
             LoginScreen(
@@ -79,7 +80,6 @@ fun AppNavigation(
                             apiClient.setToken(response.token)
                             val userRole = response.role?.lowercase() ?: "guest"
                             if (userRole == "admin") {
-                                // Carrega status inicial do sistema para o Admin
                                 val statusResult = apiClient.getSystemStatus()
                                 systemStatus = statusResult.getOrNull()
                                 navController.navigate("admin") {

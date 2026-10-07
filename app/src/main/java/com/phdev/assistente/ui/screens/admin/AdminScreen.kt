@@ -1,10 +1,14 @@
 package com.phdev.assistente.ui.screens.admin
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
@@ -13,17 +17,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.phdev.assistente.R
 import com.phdev.assistente.data.model.ChatMessage
-import com.phdev.assistente.data.model.SystemStatus
-import com.phdev.assistente.ui.theme.*
-
 import com.phdev.assistente.data.model.MediaItem
+import com.phdev.assistente.data.model.SystemStatus
 import com.phdev.assistente.ui.screens.guest.MediaDownloaderContent
+import com.phdev.assistente.ui.theme.*
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,92 +41,140 @@ fun AdminScreen(
     onActionClick: (String) -> Unit,
     onRequestDownload: (url: String, format: String, onResult: (Result<MediaItem>) -> Unit) -> Unit = { _, _, _ -> }
 ) {
-    var selectedTab by remember { mutableIntStateOf(0) } // 0 = Dashboard, 1 = Mídia, 2 = Chat Agente
+    var selectedTab by remember { mutableIntStateOf(0) }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(
-                            color = AccentPrimary.copy(alpha = 0.2f),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
+            Surface(
+                color = GlassSurface,
+                shadowElevation = 0.dp
+            ) {
+                TopAppBar(
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Logo mark
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_agente_logo),
+                                contentDescription = "Logo Agente",
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
                             Text(
-                                "ADMIN",
-                                color = AccentPrimary,
+                                "Agente",
+                                color = TextPrimary,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 11.sp,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                fontSize = 20.sp,
+                                letterSpacing = (-0.3).sp
                             )
                         }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(
-                            "Centro de Comando",
-                            color = TextPrimary,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = onLogout) {
-                        Icon(Icons.Rounded.ExitToApp, contentDescription = "Sair", tint = TextSecondary)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkBackground)
-            )
-        },
-        bottomBar = {
-            NavigationBar(containerColor = DarkSurface) {
-                NavigationBarItem(
-                    selected = selectedTab == 0,
-                    onClick = { selectedTab = 0 },
-                    icon = { Icon(Icons.Rounded.Dashboard, contentDescription = "Dashboard") },
-                    label = { Text("Painel") },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = AccentPrimary,
-                        selectedTextColor = AccentPrimary,
-                        unselectedIconColor = TextMuted,
-                        unselectedTextColor = TextMuted,
-                        indicatorColor = DarkCard
-                    )
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 },
-                    icon = { Icon(Icons.Rounded.CloudDownload, contentDescription = "Downloader") },
-                    label = { Text("Mídia") },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = AccentPrimary,
-                        selectedTextColor = AccentPrimary,
-                        unselectedIconColor = TextMuted,
-                        unselectedTextColor = TextMuted,
-                        indicatorColor = DarkCard
-                    )
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 2,
-                    onClick = { selectedTab = 2 },
-                    icon = { Icon(Icons.Rounded.Terminal, contentDescription = "Terminal & Chat") },
-                    label = { Text("Agente") },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = AccentPrimary,
-                        selectedTextColor = AccentPrimary,
-                        unselectedIconColor = TextMuted,
-                        unselectedTextColor = TextMuted,
-                        indicatorColor = DarkCard
+                    },
+                    actions = {
+                        IconButton(onClick = onLogout) {
+                            Icon(
+                                Icons.Rounded.ExitToApp,
+                                contentDescription = "Sair",
+                                tint = TextMuted
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent
                     )
                 )
             }
         },
-        containerColor = DarkBackground
+        bottomBar = {
+            Surface(
+                color = GlassSurface,
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    Color(0x1A000000)
+                )
+            ) {
+                NavigationBar(
+                    containerColor = Color.Transparent,
+                    tonalElevation = 0.dp
+                ) {
+                    NavigationBarItem(
+                        selected = selectedTab == 0,
+                        onClick = { selectedTab = 0 },
+                        icon = {
+                            Icon(
+                                Icons.Rounded.Dashboard,
+                                contentDescription = "Painel"
+                            )
+                        },
+                        label = { Text("Painel", fontSize = 12.sp) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = AccentLavender,
+                            selectedTextColor = AccentLavender,
+                            unselectedIconColor = TextMuted,
+                            unselectedTextColor = TextMuted,
+                            indicatorColor = AccentLavender.copy(alpha = 0.1f)
+                        )
+                    )
+                    NavigationBarItem(
+                        selected = selectedTab == 1,
+                        onClick = { selectedTab = 1 },
+                        icon = {
+                            Icon(
+                                Icons.Rounded.CloudDownload,
+                                contentDescription = "Mídia"
+                            )
+                        },
+                        label = { Text("Mídia", fontSize = 12.sp) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = AccentLavender,
+                            selectedTextColor = AccentLavender,
+                            unselectedIconColor = TextMuted,
+                            unselectedTextColor = TextMuted,
+                            indicatorColor = AccentLavender.copy(alpha = 0.1f)
+                        )
+                    )
+                    NavigationBarItem(
+                        selected = selectedTab == 2,
+                        onClick = { selectedTab = 2 },
+                        icon = {
+                            Icon(
+                                Icons.Rounded.Terminal,
+                                contentDescription = "Agente"
+                            )
+                        },
+                        label = { Text("Agente", fontSize = 12.sp) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = AccentLavender,
+                            selectedTextColor = AccentLavender,
+                            unselectedIconColor = TextMuted,
+                            unselectedTextColor = TextMuted,
+                            indicatorColor = AccentLavender.copy(alpha = 0.1f)
+                        )
+                    )
+                }
+            }
+        },
+        containerColor = GlassBackground
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            when (selectedTab) {
-                0 -> AdminDashboardTab(status = status, onActionClick = onActionClick)
-                1 -> MediaDownloaderContent(onRequestDownload = onRequestDownload)
-                else -> AdminAgentChatTab()
+        Box(
+            modifier = Modifier
+                .padding(paddingValues)
+                .background(brush = BackgroundGradientSimple)
+        ) {
+            // Tab content with crossfade animation
+            AnimatedContent(
+                targetState = selectedTab,
+                transitionSpec = {
+                    fadeIn(tween(300, easing = EaseOutCubic)) togetherWith
+                            fadeOut(tween(200, easing = EaseInCubic))
+                },
+                label = "tabContent"
+            ) { tab ->
+                when (tab) {
+                    0 -> AdminDashboardTab(status = status, onActionClick = onActionClick)
+                    1 -> MediaDownloaderContent(onRequestDownload = onRequestDownload)
+                    else -> AdminAgentChatTab()
+                }
             }
         }
     }
@@ -129,155 +185,326 @@ fun AdminDashboardTab(
     status: SystemStatus?,
     onActionClick: (String) -> Unit
 ) {
+    // Staggered entrance animation
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(50)
+        visible = true
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
-        // Bento Grid: Status em Tempo Real
-        Text("Infraestrutura Híbrida", color = TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        // Section: Infrastructure Status
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(tween(400, delayMillis = 0, easing = EaseOutCubic)) +
+                    slideInVertically(
+                        initialOffsetY = { 20 },
+                        animationSpec = tween(400, easing = EaseOutCubic)
+                    )
         ) {
-            // Card VPS
-            MetricCard(
-                title = "VPS Nuvem",
-                value = "${status?.vpsCpuPercent?.toInt() ?: 12}% CPU",
-                subtitle = "RAM: ${status?.vpsMemoryPercent?.toInt() ?: 38}%",
-                isOnline = true,
-                icon = Icons.Rounded.CloudQueue,
-                modifier = Modifier.weight(1f)
-            )
-
-            // Card PC Windows
-            MetricCard(
-                title = "PC Windows",
-                value = if (status?.pcConnected != false) "Online" else "Offline",
-                subtitle = status?.pcHostName ?: "DESKTOP-3EDQMEB",
-                isOnline = status?.pcConnected != false,
-                icon = Icons.Rounded.Computer,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Controles de Energia e Visão do PC
-        Text("Controle do PC (Windows)", color = TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            QuickActionButton(
-                label = "Capturar Tela",
-                icon = Icons.Rounded.Screenshot,
-                color = AccentSecondary,
-                modifier = Modifier.weight(1f),
-                onClick = { onActionClick("screenshot") }
-            )
-            QuickActionButton(
-                label = "Bloquear PC",
-                icon = Icons.Rounded.Lock,
-                color = AccentWarning,
-                modifier = Modifier.weight(1f),
-                onClick = { onActionClick("lock") }
-            )
-            QuickActionButton(
-                label = "Suspender",
-                icon = Icons.Rounded.PowerSettingsNew,
-                color = AccentDanger,
-                modifier = Modifier.weight(1f),
-                onClick = { onActionClick("suspend") }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Quick DevOps Status
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(1.dp, DarkCardBorder, RoundedCornerShape(16.dp)),
-            colors = CardDefaults.cardColors(containerColor = DarkSurface),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Rounded.RocketLaunch, contentDescription = null, tint = AccentPrimary)
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text("Easypanel & CI/CD", color = TextPrimary, fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(8.dp))
+            Column {
                 Text(
-                    "Serviços ativos: assistente (Porta 8000), worker conectado via WebSocket seguro.",
-                    color = TextSecondary,
-                    fontSize = 13.sp
+                    "Infraestrutura",
+                    color = TextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 0.3.sp
                 )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    GlassMetricCard(
+                        title = "VPS Cloud",
+                        value = "${status?.vpsCpuPercent?.toInt() ?: 12}%",
+                        valueLabel = "CPU",
+                        subtitle = "RAM: ${status?.vpsMemoryPercent?.toInt() ?: 38}%",
+                        isOnline = true,
+                        icon = Icons.Rounded.CloudQueue,
+                        modifier = Modifier.weight(1f)
+                    )
+                    GlassMetricCard(
+                        title = "PC Windows",
+                        value = if (status?.pcConnected != false) "On" else "Off",
+                        valueLabel = "",
+                        subtitle = status?.pcHostName ?: "DESKTOP",
+                        isOnline = status?.pcConnected != false,
+                        icon = Icons.Rounded.Computer,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        // Section: Quick Actions
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(tween(400, delayMillis = 100, easing = EaseOutCubic)) +
+                    slideInVertically(
+                        initialOffsetY = { 20 },
+                        animationSpec = tween(400, delayMillis = 100, easing = EaseOutCubic)
+                    )
+        ) {
+            Column {
+                Text(
+                    "Controle do PC",
+                    color = TextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 0.3.sp
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    GlassActionButton(
+                        label = "Capturar",
+                        icon = Icons.Rounded.Screenshot,
+                        accentColor = AccentSky,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onActionClick("screenshot") }
+                    )
+                    GlassActionButton(
+                        label = "Bloquear",
+                        icon = Icons.Rounded.Lock,
+                        accentColor = StatusWarning,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onActionClick("lock") }
+                    )
+                    GlassActionButton(
+                        label = "Suspender",
+                        icon = Icons.Rounded.PowerSettingsNew,
+                        accentColor = StatusOffline,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onActionClick("suspend") }
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(28.dp))
+
+        // Section: CI/CD Status
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(tween(400, delayMillis = 200, easing = EaseOutCubic)) +
+                    slideInVertically(
+                        initialOffsetY = { 20 },
+                        animationSpec = tween(400, delayMillis = 200, easing = EaseOutCubic)
+                    )
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = RoundedCornerShape(20.dp),
+                        spotColor = AccentLavender.copy(alpha = 0.06f)
+                    ),
+                shape = RoundedCornerShape(20.dp),
+                color = GlassCard,
+                border = androidx.compose.foundation.BorderStroke(1.dp, GlassCardBorder)
+            ) {
+                Row(
+                    modifier = Modifier.padding(18.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                AccentMint.copy(alpha = 0.12f),
+                                RoundedCornerShape(12.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Rounded.RocketLaunch,
+                            contentDescription = null,
+                            tint = AccentMint,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(14.dp))
+                    Column {
+                        Text(
+                            "Easypanel & CI/CD",
+                            color = TextPrimary,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 15.sp
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            "Serviço ativo na porta 8000 · Worker conectado",
+                            color = TextMuted,
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
+                        )
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun MetricCard(
+fun GlassMetricCard(
     title: String,
     value: String,
+    valueLabel: String,
     subtitle: String,
     isOnline: Boolean,
     icon: ImageVector,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.border(1.dp, DarkCardBorder, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = DarkSurface),
-        shape = RoundedCornerShape(16.dp)
+    Surface(
+        modifier = modifier
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = AccentLavender.copy(alpha = 0.06f)
+            ),
+        shape = RoundedCornerShape(20.dp),
+        color = GlassCard,
+        border = androidx.compose.foundation.BorderStroke(1.dp, GlassCardBorder)
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(icon, contentDescription = null, tint = AccentSecondary, modifier = Modifier.size(20.dp))
                 Box(
                     modifier = Modifier
-                        .size(8.dp)
-                        .clip(RoundedCornerShape(50))
-                        .background(if (isOnline) AccentSuccess else AccentDanger)
+                        .size(36.dp)
+                        .background(
+                            AccentLavender.copy(alpha = 0.08f),
+                            RoundedCornerShape(10.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        icon,
+                        contentDescription = null,
+                        tint = AccentLavenderSoft,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+                // Online indicator with pulse
+                val pulseAlpha = if (isOnline) {
+                    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+                    val alpha by infiniteTransition.animateFloat(
+                        initialValue = 0.4f,
+                        targetValue = 1f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(1200, easing = EaseInOutSine),
+                            repeatMode = RepeatMode.Reverse
+                        ),
+                        label = "pulseAlpha"
+                    )
+                    alpha
+                } else 1f
+
+                Box(
+                    modifier = Modifier
+                        .size(10.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (isOnline) StatusOnline.copy(alpha = pulseAlpha)
+                            else StatusOffline
+                        )
                 )
             }
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(title, color = TextMuted, fontSize = 12.sp)
-            Text(value, color = TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-            Text(subtitle, color = TextSecondary, fontSize = 11.sp)
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                title,
+                color = TextMuted,
+                fontSize = 12.sp
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Row(
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(
+                    value,
+                    color = TextPrimary,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.5).sp
+                )
+                if (valueLabel.isNotEmpty()) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        valueLabel,
+                        color = TextMuted,
+                        fontSize = 13.sp,
+                        modifier = Modifier.padding(bottom = 2.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                subtitle,
+                color = TextMuted,
+                fontSize = 11.sp
+            )
         }
     }
 }
 
 @Composable
-fun QuickActionButton(
+fun GlassActionButton(
     label: String,
     icon: ImageVector,
-    color: Color,
+    accentColor: Color,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    OutlinedButton(
+    Surface(
         onClick = onClick,
-        modifier = modifier.height(60.dp),
-        shape = RoundedCornerShape(14.dp),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary),
-        border = androidx.compose.foundation.BorderStroke(1.dp, DarkCardBorder)
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        color = GlassCard,
+        border = androidx.compose.foundation.BorderStroke(1.dp, GlassCardBorder)
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(label, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+        Column(
+            modifier = Modifier
+                .padding(vertical = 14.dp, horizontal = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(
+                        accentColor.copy(alpha = 0.1f),
+                        RoundedCornerShape(10.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = accentColor,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                label,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = TextPrimary
+            )
         }
     }
 }
@@ -289,7 +516,7 @@ fun AdminAgentChatTab() {
             listOf(
                 ChatMessage(
                     id = "1",
-                    text = "Fala meu consagrado! Painel mobile conectado. Como posso ajudar com a VPS ou com o PC hoje?",
+                    text = "Agente pronto. Como posso ajudar com a VPS ou com o PC?",
                     isFromUser = false
                 )
             )
@@ -297,22 +524,30 @@ fun AdminAgentChatTab() {
     }
     var inputText by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),
-            reverseLayout = true
+            reverseLayout = true,
+            contentPadding = PaddingValues(vertical = 12.dp)
         ) {
             items(messages.reversed()) { msg ->
-                ChatBubble(message = msg)
+                GlassChatBubble(message = msg)
                 Spacer(modifier = Modifier.height(10.dp))
             }
         }
 
+        // Chat input bar
         Surface(
-            color = DarkSurface,
-            border = androidx.compose.foundation.BorderStroke(1.dp, DarkCardBorder)
+            color = GlassSurface,
+            border = androidx.compose.foundation.BorderStroke(
+                1.dp,
+                Color(0x1A000000)
+            )
         ) {
             Row(
                 modifier = Modifier
@@ -323,34 +558,53 @@ fun AdminAgentChatTab() {
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = { inputText = it },
-                    placeholder = { Text("Manda a instrução pro agente...") },
+                    placeholder = {
+                        Text(
+                            "Enviar instrução ao agente...",
+                            color = TextMuted,
+                            fontSize = 14.sp
+                        )
+                    },
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(20.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AccentPrimary,
-                        unfocusedBorderColor = DarkCardBorder,
+                        focusedBorderColor = AccentLavenderSoft,
+                        unfocusedBorderColor = GlassCardBorder,
                         focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary
-                    )
+                        unfocusedTextColor = TextPrimary,
+                        cursorColor = AccentLavender
+                    ),
+                    singleLine = true
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                IconButton(
+                FilledIconButton(
                     onClick = {
                         if (inputText.isNotBlank()) {
-                            val userMsg = ChatMessage(id = System.currentTimeMillis().toString(), text = inputText, isFromUser = true)
+                            val userMsg = ChatMessage(
+                                id = System.currentTimeMillis().toString(),
+                                text = inputText,
+                                isFromUser = true
+                            )
                             messages = messages + userMsg
                             inputText = ""
-                            // Simulação de resposta imediata
                             messages = messages + ChatMessage(
                                 id = (System.currentTimeMillis() + 1).toString(),
-                                text = "Comando recebido pelo agente! Processando no terminal...",
+                                text = "Comando recebido. Processando...",
                                 isFromUser = false
                             )
                         }
                     },
-                    colors = IconButtonDefaults.iconButtonColors(containerColor = AccentPrimary)
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = AccentLavender,
+                        contentColor = TextOnAccent
+                    ),
+                    modifier = Modifier.size(44.dp)
                 ) {
-                    Icon(Icons.Rounded.Send, contentDescription = "Enviar", tint = Color.White)
+                    Icon(
+                        Icons.Rounded.Send,
+                        contentDescription = "Enviar",
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
             }
         }
@@ -358,23 +612,35 @@ fun AdminAgentChatTab() {
 }
 
 @Composable
-fun ChatBubble(message: ChatMessage) {
-    val alignment = if (message.isFromUser) Alignment.End else Alignment.Start
-    val bg = if (message.isFromUser) AccentPrimary else DarkCard
+fun GlassChatBubble(message: ChatMessage) {
+    val isUser = message.isFromUser
+    val alignment = if (isUser) Alignment.End else Alignment.Start
 
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = alignment
     ) {
         Surface(
-            color = bg,
-            shape = RoundedCornerShape(16.dp)
+            color = if (isUser) AccentLavender else GlassCard,
+            shape = RoundedCornerShape(
+                topStart = 18.dp,
+                topEnd = 18.dp,
+                bottomStart = if (isUser) 18.dp else 4.dp,
+                bottomEnd = if (isUser) 4.dp else 18.dp
+            ),
+            border = if (!isUser) {
+                androidx.compose.foundation.BorderStroke(1.dp, GlassCardBorder)
+            } else null,
+            shadowElevation = if (!isUser) 2.dp else 4.dp
         ) {
             Text(
                 text = message.text,
-                color = TextPrimary,
+                color = if (isUser) TextOnAccent else TextPrimary,
                 fontSize = 14.sp,
-                modifier = Modifier.padding(14.dp)
+                lineHeight = 20.sp,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .widthIn(max = 280.dp)
             )
         }
     }

@@ -1,79 +1,120 @@
 package com.phdev.assistente.ui.theme
 
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.lightColorScheme
 
-// Warm Brown & Cream Palette (Light Modern Theme)
-val LightBackground = Color(0xFFF9F7F4)       // Baunilha / Linho claro suave
-val LightSurface = Color(0xFFFFFFFF)          // Branco puro para elevação/cards primários
-val LightSurfaceAlt = Color(0xFFF2ECE4)       // Creme amendoado para contraste sutil
-val LightCard = Color(0xFFFFFFFF)
-val LightCardBorder = Color(0xFFE8DFD5)       // Borda quente e delicada
-val LightCardBorderMuted = Color(0xFFF0EAE1)
+// ─── Glassmorphism Ethereal Palette ───────────────────────────────────────────
+// Inspired by frosted glass, soft pastels, and translucent light
 
-// Marrons Nobres (Espresso, Caramelo, Castanho Quente)
-val MochaPrimary = Color(0xFF4A2E18)         // Espresso marcante para títulos e botões principais
-val MochaSecondary = Color(0xFF7C5335)       // Marrom intermediário aconchegante
-val TerracottaAccent = Color(0xFFB85D38)     // Terracota vivo para destaques energéticos
-val CaramelGlow = Color(0xFFD48B47)          // Dourado/Caramelo elegante para gradientes
-val SandAccent = Color(0xFFEADBC8)           // Areia dourada para chips e backgrounds de tags
+// Background Gradients
+val GlassBackground = Color(0xFFF0EEFF)         // Lavender mist
+val GlassMint = Color(0xFFE8FBF3)                // Soft mint
+val GlassSky = Color(0xFFE6F0FF)                 // Pale sky
+val GlassLavender = Color(0xFFEDE8FF)             // Light lavender
 
-// Cores de Status Refinadas em Tons Terrosos / Quentes
-val StatusSuccess = Color(0xFF2E6948)        // Verde floresta orgânico
-val StatusSuccessBg = Color(0xFFEBF5EE)
-val StatusError = Color(0xFFA83232)          // Vermelho terracota
-val StatusErrorBg = Color(0xFFFDF0F0)
-val StatusWarning = Color(0xFFC27803)        // Âmbar
-val StatusWarningBg = Color(0xFFFEF7E6)
+// Surface & Cards (Frosted Glass)
+val GlassSurface = Color(0xCCFFFFFF)              // White at 80% opacity
+val GlassSurfaceAlt = Color(0x99FFFFFF)           // White at 60% opacity
+val GlassCard = Color(0xB3FFFFFF)                 // White at 70% opacity
+val GlassCardBorder = Color(0x33B4A5E8)           // Lavender border at 20%
+val GlassCardBorderFocused = Color(0x66A78BFA)    // Lavender border focused
 
-// Tipografia e Texto
-val TextPrimary = Color(0xFF2B1B12)          // Marrom muito escuro / quase café para legibilidade máxima
-val TextSecondary = Color(0xFF736055)        // Marrom neutro atenuado
-val TextMuted = Color(0xFFA69488)            // Marrom suave para placeholders e notas
-val TextOnDark = Color(0xFFFFFDFC)           // Branco quebrado para leitura em cima de botões escuros
+// Accent Colors (Gradient Spectrum)
+val AccentLavender = Color(0xFF8B5CF6)            // Vibrant lavender
+val AccentLavenderSoft = Color(0xFFA78BFA)        // Soft lavender
+val AccentSky = Color(0xFF60A5FA)                 // Sky blue
+val AccentMint = Color(0xFF34D399)                // Emerald mint
+val AccentRose = Color(0xFFFB7185)                // Soft rose
 
-// Gradientes Quentes de Alto Padrão
-val WarmMochaGradient = Brush.linearGradient(
-    colors = listOf(MochaPrimary, MochaSecondary)
+// Status Colors
+val StatusOnline = Color(0xFF34D399)              // Mint green
+val StatusOnlineBg = Color(0x1A34D399)
+val StatusOffline = Color(0xFFFB7185)             // Rose
+val StatusOfflineBg = Color(0x1AFB7185)
+val StatusWarning = Color(0xFFFBBF24)             // Amber
+val StatusWarningBg = Color(0x1AFBBF24)
+
+// Text Hierarchy
+val TextPrimary = Color(0xFF1E1B4B)               // Deep indigo
+val TextSecondary = Color(0xFF6366F1).copy(alpha = 0.6f) // Indigo muted
+val TextMuted = Color(0xFF9CA3AF)                 // Cool gray
+val TextOnAccent = Color(0xFFFFFFFF)              // Pure white
+
+// Gradients
+val PrimaryGradient = Brush.linearGradient(
+    colors = listOf(AccentLavender, AccentSky)
 )
 
-val TerracottaGlowGradient = Brush.linearGradient(
-    colors = listOf(TerracottaAccent, CaramelGlow)
+val BackgroundGradient = Brush.verticalGradient(
+    colors = listOf(
+        GlassLavender,
+        GlassSky,
+        GlassMint,
+        GlassLavender
+    )
 )
 
-val CardWarmSubtleGradient = Brush.verticalGradient(
-    colors = listOf(Color(0xFFFFFFFF), Color(0xFFFAF7F2))
+val BackgroundGradientSimple = Brush.verticalGradient(
+    colors = listOf(
+        GlassLavender,
+        GlassSky
+    )
 )
 
-val HeaderWarmGradient = Brush.verticalGradient(
-    colors = listOf(Color(0xFFF5EFE6), Color(0xFFF9F7F4))
+val CardGlowGradient = Brush.verticalGradient(
+    colors = listOf(
+        Color(0x0DA78BFA),
+        Color(0x00A78BFA)
+    )
 )
 
-// Aliases de compatibilidade para telas legadas (Dark Theme / Antigo design)
-val DarkBackground = LightBackground
-val DarkSurface = LightSurface
-val DarkCard = LightCard
-val DarkCardBorder = LightCardBorder
+val AccentButtonGradient = Brush.horizontalGradient(
+    colors = listOf(AccentLavender, AccentSky, AccentMint)
+)
 
-val AccentPrimary = MochaPrimary
-val AccentSecondary = MochaSecondary
+val SubtleGlassGradient = Brush.verticalGradient(
+    colors = listOf(
+        Color(0x40FFFFFF),
+        Color(0x1AFFFFFF)
+    )
+)
+
+// ── Legacy Aliases (backward compat) ──────────────────────────────────────────
+val DarkBackground = GlassBackground
+val DarkSurface = GlassSurface
+val DarkCard = GlassCard
+val DarkCardBorder = GlassCardBorder
+val LightBackground = GlassBackground
+val LightSurface = Color(0xFFFFFFFF)
+val LightSurfaceAlt = GlassSky
+
+val AccentPrimary = AccentLavender
+val AccentSecondary = AccentSky
 val AccentWarning = StatusWarning
-val AccentSuccess = StatusSuccess
-val AccentDanger = StatusError
+val AccentSuccess = StatusOnline
+val AccentDanger = StatusOffline
 
-// Esquema Material3
+val MochaPrimary = AccentLavender
+val MochaSecondary = AccentSky
+val TerracottaAccent = AccentRose
+val SandAccent = Color(0xFFEDE8FF)
+val TextOnDark = TextOnAccent
+
+val WarmMochaGradient = PrimaryGradient
+
+// ── Material 3 Color Scheme ───────────────────────────────────────────────────
 val AssistenteColorScheme = lightColorScheme(
-    primary = MochaPrimary,
-    onPrimary = TextOnDark,
-    secondary = MochaSecondary,
-    onSecondary = TextOnDark,
-    tertiary = TerracottaAccent,
-    background = LightBackground,
-    surface = LightSurface,
+    primary = AccentLavender,
+    onPrimary = TextOnAccent,
+    secondary = AccentSky,
+    onSecondary = TextOnAccent,
+    tertiary = AccentMint,
+    background = GlassBackground,
+    surface = Color(0xFFFFFFFF),
     onBackground = TextPrimary,
     onSurface = TextPrimary,
-    surfaceVariant = LightSurfaceAlt,
-    onSurfaceVariant = TextSecondary,
-    outline = LightCardBorder
+    surfaceVariant = GlassSky,
+    onSurfaceVariant = TextPrimary.copy(alpha = 0.7f),
+    outline = GlassCardBorder
 )
